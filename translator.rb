@@ -9,7 +9,13 @@ class Db
 
   def q( query )
 
-    return @@con.query( query )
+    result = @@con.query( query )
+    
+    r_hash = result.fetch_hash
+
+    result.free
+
+    return r_hash
 
   end
 
@@ -98,11 +104,88 @@ class Address
     :content_filter,
     :whitelisted_addrs_only
 
+  def update_existing( )
+    
+    # TODO
+    #
+    raise "Not Implemented."
+
+  end
+
+  def insert_addr( )
+
+    q = "INSERT INTO addresses " +
+      "( " +
+        "local_part, " +
+        "domain_id, " +
+        "user_id, " +
+        "enabled, "
+
+    if @content_filter
+
+      q += "content_filter, "
+
+    end
+
+    q += "whitelisted_addrs_only " +
+      ") VALUES ( " +
+        "'" + @local_part + "', " +
+        @domain_id + ", " +
+        @user_id + ", "
+
+    if @enabled
+
+      q+= @enabled + ", "
+
+    end
+
+    if @content_filter
+
+      q += @content_filter + ", "
+
+    end
+
+    if @whitelisted_addrs_only
+      
+      q += @whitelisted_addrs_only + ", "
+
+    end
+
+    q += " )"
+    
+    @conn.q( q )
+
+    q = "SELECT LAST_INSERT_ID()"
+
+    return @conn.q ( q )
+
+  end
+
+  def save()
+
+    if @id
+
+      update_existing( )
+
+    else
+
+      @id = insert_addr( )
+
+    end
+
+  end
+
   def initialize( @user_id, address )
 
     @local_part,domain = address.split("@")
 
+    @domain_id = Domain.get( domain )
+    
+    if ! @domain_id
 
+      raise "Address contains invalid domain"
+
+    end
 
   end
 
@@ -139,7 +222,10 @@ class User
 
     @id = insert_user_row
 
-    @default_from_addr_id = Address.new( @id, @real_local_addr )["id"]
+    addr = Address.new( @id, @real_local_addr )
+    addr.save
+    
+    @default_from_addr_id = addr.id
 
     @conn.close
 
@@ -153,8 +239,88 @@ class User
 
 end
 
-class CreateUser
+class Translator
+
+  def process_opts()
+
+    opts = Trollop::options do
+      opt :createuser, "Register a new user", :short => "n", :type => :string
+      opt :from, "From Address", :short => "f", :type => :string
+      opt :to, "To Address", :short => "t", :type => :string
+      opt :direction, "Direction: inbound/outbound", :short => "d", :type => :string
+      opt :createalias, "Create an alias adddress (requires -u)", :short => "a", :type => :string
+      opt :user, "Real local address associated with alias", :short => "u", :type => :string
+    end
+
+    return opts
+
+  end
+
+  def translate_address( from, to, direction )
+
+    case direction
+    when "inbound"
+
+    when "outbound"
+    end
+
+  end
+
+  def create_alias( alias_addr, real_local_addr )
+
+    u_id = User.get( real_local_addr ).id
+
+    a = Alias.new( u_id, alias_addr )
+
+    a.save
+
+    puts "Alias created.  ID: #{a.id}"
+
+  end
+
+  def create_user( real_local_addr )
+
+    # In our system, real_local_addr and "username" are essentially
+    # interchangeable concepts. ;-)
+    
+    u = User.new( real_local_addr )
+    u.save
+
+    puts "User created.  ID: #{u.id}"
+
+  end
+
+  def initialize()
+
+    opts = process_opts
+
+    case
+      when opts[:from] && opts[:to] && opts[:direction]
+    
+        output = translate_address( opts[:from], 
+                                      opts[:to], 
+                                      opts[:direction] )
+
+        if opts[:direction] == "inbound"
+
+          real_local_address = output
+
+          puts real_local_address
+          
+        end
+
+      when opts[:createuser]
+
+        create_user( opts[:createuser] )
+
+      when opts[:createalias] && opts[:user]
+
+        create_alias( opts[:createalias], opts[:user] )
+
+    end
+
+  end
+
 end
 
-class TranslateAddress
-end
+Translator.new()
