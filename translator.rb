@@ -5,6 +5,8 @@ require 'trollop'
 require 'mysql'
 require 'yaml'
 
+# test comment
+
 class Db
 
   def q( query )
