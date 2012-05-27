@@ -9,7 +9,7 @@ class Domain
 
     conn = Db.new
 
-    result = Db.q( "SELECT * " +
+    result = conn.q( "SELECT * " +
                  "FROM domains " +
                  "WHERE id = " + id +
                  "LIMIT 1" )
