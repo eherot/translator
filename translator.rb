@@ -114,6 +114,8 @@ class Translator
 
           new_from_addr = new_from_local_part + "@" + new_from_domain
 
+          Log.debug( "new_from_addr: #{new_from_addr}" )
+
           return new_from_addr
 
         else
@@ -124,7 +126,7 @@ class Translator
           # the contact with the user's primary address (depending on
           # configuration).
 
-          Log.info( "OUTBOUND: NEW CONTACT" )
+          Log.info( "OUTBOUND: NEW CONTACT (UID: #{u_id})" )
 
           contact = Contact.new
 
