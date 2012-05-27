@@ -143,7 +143,11 @@ class Translator
           contact.whitelisted = 1
           contact.blacklisted = 0
 
+          contact.conn = Db.new
+
           contact.save
+
+          contact.conn.close
 
         end
 
