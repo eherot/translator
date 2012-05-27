@@ -6,6 +6,7 @@ class Contact
     :address_id,
     :whitelisted,
     :blacklisted,
+    :user_id,
     :conn
 
   def self.get_by_address( user_id, contact_email )
@@ -47,7 +48,8 @@ class Contact
 
     end
 
-    q += ") VALUES (" +
+    q += ",user_id" + 
+      ") VALUES (" +
       "'" + @contact_email + "'," +
       @address_id
 
@@ -63,7 +65,8 @@ class Contact
 
     end
 
-    q += ")"
+    q += "," + @user_id +
+      ")"
 
     @conn.q( q )
 

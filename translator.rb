@@ -62,7 +62,9 @@ class Translator
 
           db_conn = Db.new
 
-          a = Address.new( a_obj["user_id"], to )
+          user_id = a_obj["user_id"]
+
+          a = Address.new( user_id, to )
 
           a.conn = db_conn
 
@@ -72,6 +74,7 @@ class Translator
 
           c.conn = db_conn
           
+          c.user_id = user_id
           c.contact_email = from
           c.address_id = a.id
           c.whitelisted,c.blacklisted = 0,0
@@ -97,7 +100,7 @@ class Translator
 
         if c_obj = Contact.get_by_address( u_id, to )
 
-          Log.info( "OUTBOUND: EXISTING CONTACT" )
+          Log.info( "OUTBOUND: EXISTING CONTACT (UID: #{u_id})" )
 
           # User has had previous contact with this outside contact.
           # Lets find out what is their associated address so we can
@@ -126,6 +129,7 @@ class Translator
           contact = Contact.new
 
           contact.contact_email = to
+          contact.user_id = u_id
 
           u_obj = User.get( u_id )
 
