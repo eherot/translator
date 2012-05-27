@@ -15,7 +15,7 @@ class Contact
       "WHERE " +
         "user_id = " + user_id +
           " AND " +
-        "contact_email = " + contact_email +
+        "contact_email = '" + contact_email + "'" +
         " LIMIT 1"
 
     conn = Db.new
