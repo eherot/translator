@@ -58,10 +58,12 @@ class Translator
 
           a.save
 
-          c = Contact.new( from, a.id )
+          c = Contact.new
 
           c.conn = db_conn
-
+          
+          c.contact_email = from
+          c.address_id = a.id
           c.whitelisted,c.blacklisted = 0,0
 
           c.save
