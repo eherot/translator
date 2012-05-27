@@ -5,6 +5,8 @@ class Db
     begin
 
       result = @con.query( query )
+    
+      r_hash = result.fetch_hash
 
     rescue Exception => e
 
@@ -12,8 +14,6 @@ class Db
       raise
 
     end
-    
-    r_hash = result.fetch_hash
 
     result.free
 
