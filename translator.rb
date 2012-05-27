@@ -32,7 +32,7 @@ class Translator
 
   def get_security_result_code( user_obj, addr_obj, from )
 
-    if contact_obj = Contact.get( from )
+    if contact_obj = Contact.get_by_address( addr_obj["id"], from )
 
       case
       when contact_obj["whitelisted"] == "1"
