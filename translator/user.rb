@@ -50,11 +50,11 @@ class User
 
     if search_str =~ /^\D+$/
 
-      user_obj = get_user_by_id( search_str )
+      user_obj = get_user_by_name( search_str )
 
     else
 
-      user_obj = get_user_by_name( search_str )
+      user_obj = get_user_by_id( search_str )
 
     end
 

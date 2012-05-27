@@ -60,11 +60,11 @@ class Address
 
     if search_str =~ /^\D+$/
 
-      addr_obj = get_addr_by_id( search_str )
+      addr_obj = get_addr_by_name( search_str )
 
     else
 
-      addr_obj = get_addr_by_name( search_str )
+      addr_obj = get_addr_by_id( search_str )
 
     end
 

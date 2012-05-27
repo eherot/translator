@@ -39,11 +39,11 @@ class Domain
 
     if search_str =~ /^\D+$/
 
-      domain_obj = get_domain_by_id( search_str )
+      domain_obj = get_domain_by_name( search_str )
 
     else
 
-      domain_obj = get_domain_by_name( search_str )
+      domain_obj = get_domain_by_id( search_str )
 
     end
 
