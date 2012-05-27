@@ -117,7 +117,7 @@ class Address
 
     q = "SELECT LAST_INSERT_ID()"
 
-    return @conn.q( q )
+    return @conn.q( q )["LAST_INSERT_ID()"]
 
   end
 

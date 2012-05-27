@@ -70,7 +70,7 @@ class Contact
 
     q = "SELECT LAST_INSERT_ID()"
 
-    result = conn.q( q )
+    result = conn.q( q )["LAST_INSERT_ID()"]
 
     conn.close
 
