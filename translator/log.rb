@@ -8,7 +8,11 @@ class Log
 
   def self.info( msg )
 
-    log_out( "info", msg )
+    unless $SILENT
+
+      log_out( "info", msg )
+
+    end
 
   end
 
