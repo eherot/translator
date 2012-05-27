@@ -21,7 +21,10 @@ class Translator
       opt :direction, "Direction: inbound/outbound", :short => "d", :type => :string
       opt :createalias, "Create an alias adddress (requires -u)", :short => "a", :type => :string
       opt :user, "Real local address associated with alias", :short => "u", :type => :string
+      opt :silent, "Silent (only output errors)", :short => "s", :default => false
     end
+
+    $SILENT = opts[:silent]
 
     return opts
 
