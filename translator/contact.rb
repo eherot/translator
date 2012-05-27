@@ -65,15 +65,11 @@ class Contact
 
     q += ")"
 
-    conn = Db.new
-
-    conn.q( q )
+    @conn.q( q )
 
     q = "SELECT LAST_INSERT_ID()"
 
-    result = conn.q( q )["LAST_INSERT_ID()"]
-
-    conn.close
+    result = @conn.q( q )["LAST_INSERT_ID()"]
 
     return result
 
