@@ -97,6 +97,8 @@ class Translator
 
         if c_obj = Contact.get_by_address( u_id, to )
 
+          Log.info( "OUTBOUND: EXISTING CONTACT" )
+
           # User has had previous contact with this outside contact.
           # Lets find out what is their associated address so we can
           # use it in the "FROM" field.
@@ -119,6 +121,8 @@ class Translator
           # the contact with the user's primary address (depending on
           # configuration).
 
+          Log.info( "OUTBOUND: NEW CONTACT" )
+
           contact = Contact.new
 
           contact.contact_email = to
@@ -126,6 +130,8 @@ class Translator
           u_obj = User.get( u_id )
 
           if u_obj["new_addr_on_outbound"] == 1
+
+            Log.debug( "new_addr_on_outbound ENABLED" )
 
             new_unique_address = Address.generate_uniq_addr( u_obj )
 
@@ -137,6 +143,8 @@ class Translator
             new_from_addr = new_unique_address
 
           else
+
+            Log.debug( "new_addr_on_outbound DISABLED" )
 
             contact.address_id = u_obj["default_from_addr_id"]
 
