@@ -219,13 +219,7 @@ class Translator
                                       opts[:to], 
                                       opts[:direction] )
 
-        if opts[:direction] == "inbound"
-
-          real_local_address = output
-
-          puts real_local_address
-          
-        end
+        puts output
 
       when opts[:createuser]
 
