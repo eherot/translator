@@ -30,6 +30,52 @@ class Translator
 
   end
 
+  def get_security_result_code( user_obj, addr_obj, from )
+
+    if contact_obj = Contact.get( from )
+
+      case
+      when contact_obj["whitelisted"] == "1"
+
+        return { 
+          "accept" => true,
+          "status" => 200,
+          "reason" => "Whitelisted sender"
+        }
+
+      when contact_obj["blacklisted"] == "1"
+
+        return {
+          "accept" => false,
+          "status" => 500,
+          "reason" => "Blacklisted sender"
+        }
+
+      end
+
+    end
+
+    case
+    when addr_obj["enabled"] == "0"
+
+      return {
+        "accept" => false,
+        "status" => 501,
+        "reason" => "Sent to Disabled address"
+      }
+
+    when Address.is_default( user_obj, addr_obj )
+
+      return {
+        "accept" => false,
+        "status" => 502,
+        "reason" => "Sent to default address"
+      }
+
+    end
+
+  end
+
   def translate_address( from, to, direction )
 
     # On "inbound" this method should return the "real" local address where
@@ -43,11 +89,24 @@ class Translator
 
       if a_obj = Address.get( to )
 
+        Log.info( "INBOUND: TO EXISTING ADDRESS (UID: #{a_obj["user_id"]}" )
+
         u_id = a_obj["user_id"]
 
-        real_local_addr = User.get( u_id )["real_local_addr"]
+        u_obj = User.get( u_id )
+        real_local_addr = u_obj["real_local_addr"]
 
-        return real_local_addr
+        security_result = get_security_result_code( u_obj, a_obj, from )
+
+        if security_result["accept"] == false
+
+          return "REJECT because #{security_result["reason"]}"
+
+        else
+
+          return real_local_addr
+
+        end
 
       else
 
@@ -62,6 +121,8 @@ class Translator
         real_local_addr = real_addr_part + "@" + recipient_domain
 
         if a_obj = Address.get( real_local_addr )
+
+          Log.info( "INBOUND: TO NEW ADDRESS (UID: #{a_obj["user_id"]}" )
 
           db_conn = Db.new
 

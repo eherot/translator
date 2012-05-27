@@ -73,6 +73,20 @@ class Address
 
   end
 
+  def self.is_default( user_obj, addr_obj )
+
+    if user_obj["default_from_addr_id"] == addr_obj["id"]
+
+      return true
+
+    else
+
+      return false
+
+    end
+
+  end
+
   def insert_addr( )
 
     q = "INSERT INTO addresses " +
