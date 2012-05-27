@@ -100,7 +100,9 @@ class Translator
 
         if security_result["accept"] == false
 
-          return "REJECT because #{security_result["reason"]}"
+          Log.info("REJECTED because #{security_result["reason"]}")
+
+          return "REJECT"
 
         else
 
