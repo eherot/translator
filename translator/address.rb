@@ -24,7 +24,7 @@ class Address
 
     conn = Db.new
 
-    result = Db.q( "SELECT * " +
+    result = conn.q( "SELECT * " +
                  "FROM addresses " +
                  "WHERE id = " + id +
                  "LIMIT 1" )
