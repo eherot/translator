@@ -116,8 +116,6 @@ class Translator
 
           Log.debug( "new_from_addr: #{new_from_addr}" )
 
-          return new_from_addr
-
         else
 
           # User has not previously sent or received anything from this
@@ -171,9 +169,9 @@ class Translator
 
           contact.conn.close
 
-          return new_from_addr
-
         end
+
+        return new_from_addr
 
       else
 
