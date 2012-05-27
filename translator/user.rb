@@ -31,7 +31,7 @@ class User
     q = "UPDATE users " +
       "SET default_from_addr_id = " + 
       @default_from_addr_id + 
-      " WHERE user_id = " + @id
+      " WHERE id = " + @id
 
     @conn.q( q )
 
