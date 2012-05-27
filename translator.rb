@@ -5,241 +5,10 @@ require 'trollop'
 require 'mysql'
 require 'yaml'
 
-# test comment
-
-class Db
-
-  def q( query )
-
-    result = @@con.query( query )
-    
-    r_hash = result.fetch_hash
-
-    result.free
-
-    return r_hash
-
-  end
-
-  def close()
-
-    @@con.close
-
-  end
-
-  def initialize()
-
-    dbconf_file = "database.yml"
-
-    dbconf = YAML::load(File.open(dbconf_file))
-
-    @@con = Mysql.new( dbconf["host"],
-                    dbconf["username"],
-                    dbconf["password"],
-                    dbconf["database"] )
-
-  end
-
-end
-
-class Domain
-  
-  attr_accessor :id,
-    :domain,
-    :domain_obj
-
-  def get_domain_by_id( @id )
-
-    conn = Db.new
-
-    result = Db.q( "SELECT * " +
-                 "FROM domain " +
-                 "WHERE id = " + @id +
-                 "LIMIT 1" )
-
-    conn.close
-
-    return result
-
-  end
-
-  def get_domain_by_name( @domain )
-
-    conn = Db.new
-
-    result = Db.q( "SELECT * " +
-                  "FROM domain " +
-                  "WHERE domain = '" + @domain + "' " +
-                  "LIMIT 1" )
-
-    conn.close
-
-    return result
-
-  end
-
-  def get( search_str )
-
-    if search_str =~ /^\D+$/
-
-      @domain_obj = get_domain_by_id( search_str )
-
-    else
-
-      @domain_obj = get_domain_by_name( search_str )
-
-    end
-
-    return @domain_obj
-
-  end
-
-end
-
-class Address
-
-  attr_accessor :id,
-    :local_part,
-    :domain_id,
-    :user_id,
-    :enabled,
-    :content_filter,
-    :whitelisted_addrs_only
-
-  def update_existing( )
-    
-    # TODO
-    #
-    raise "Not Implemented."
-
-  end
-
-  def insert_addr( )
-
-    q = "INSERT INTO addresses " +
-      "( " +
-        "local_part, " +
-        "domain_id, " +
-        "user_id, " +
-        "enabled, "
-
-    if @content_filter
-
-      q += "content_filter, "
-
-    end
-
-    q += "whitelisted_addrs_only " +
-      ") VALUES ( " +
-        "'" + @local_part + "', " +
-        @domain_id + ", " +
-        @user_id + ", "
-
-    if @enabled
-
-      q+= @enabled + ", "
-
-    end
-
-    if @content_filter
-
-      q += @content_filter + ", "
-
-    end
-
-    if @whitelisted_addrs_only
-      
-      q += @whitelisted_addrs_only + ", "
-
-    end
-
-    q += " )"
-    
-    @conn.q( q )
-
-    q = "SELECT LAST_INSERT_ID()"
-
-    return @conn.q ( q )
-
-  end
-
-  def save()
-
-    if @id
-
-      update_existing( )
-
-    else
-
-      @id = insert_addr( )
-
-    end
-
-  end
-
-  def initialize( @user_id, address )
-
-    @local_part,domain = address.split("@")
-
-    @domain_id = Domain.get( domain )
-    
-    if ! @domain_id
-
-      raise "Address contains invalid domain"
-
-    end
-
-  end
-
-end
-
-class User
-
-  attr_accessor :id, 
-    :default_from_addr_id,
-    :real_local_addr
-
-  def insert_user_row()
-
-    q = "INSERT INTO users " +
-      "( " +
-        "real_local_addr " +
-      ") " +
-      "VALUES " +
-      "( " +
-        @real_local_addr +
-      ") "
-
-    @conn.q( q )
-
-    q = "SELECT LAST_INSERT_ID()"
-
-    return @conn.q( q )
-
-  end
-
-  def save( )
-
-    @conn = Db.new
-
-    @id = insert_user_row
-
-    addr = Address.new( @id, @real_local_addr )
-    addr.save
-    
-    @default_from_addr_id = addr.id
-
-    @conn.close
-
-  end
-
-  def initialize( real_local_addr )
-
-    @real_local_addr = real_local_addr
-
-  end
-
-end
+require 'translator/log'
+require 'translator/address'
+require 'translator/contact'
+require 'translator/user'
 
 class Translator
 
@@ -263,16 +32,112 @@ class Translator
     case direction
     when "inbound"
 
+      if u_id = Address.get( to )["user_id"]
+
+        real_local_addr = User.get( u_id )["real_local_addr"]
+
+      else
+
+        recipient_local_part,recipient_domain = to.split("@")
+
+        recipient_local_part_arr = recipient_local_part.split(".")
+
+        real_addr_part = recipient_local_part_arr[0..-2].join(".")
+
+        unique_addr_part = recipient_local_part_arr.last
+
+        if Address.get( "#{real_addr_part}@#{recipient_domain}" )
+
+          a = Address.new( to )
+          a.save
+
+          c = Contact.new( from, a.id )
+
+          c.whitelisted,c.blacklisted = 0,0
+
+          c.save
+
+        else
+
+          Log.error "INVALID RECIPIENT ADDRESS"
+          exit 1
+
+        end
+
+      end
+
     when "outbound"
+
+      if u_id = Address.get( from )["user_id"]
+
+        if c_obj = Contact.get_by_address( u_id, to )
+
+          # User has had previous contact with this outside contact.
+          # Lets find out what is their associated address so we can
+          # use it in the "FROM" field.
+
+          new_from_addr_obj = Address.get( c_obj["address_id"] )
+
+          new_from_local_part = new_from_addr_obj["local_part"]
+
+          new_from_domain = Domain.get( new_from_addr_obj["domain_id"] )["domain"]
+
+          new_from_addr = new_from_local_part + "@" + new_from_domain
+
+          return new_from_addr
+
+        else
+
+          # User has not previously sent or received anything from this
+          # outside contact.  We must add a new contacts entry for this 
+          # contact and either create a new unique address or associate
+          # the contact with the user's primary address (depending on
+          # configuration).
+
+          contact = Contact.new
+
+          contact.contact_email = to
+
+          u_obj = User.get( u_id )
+
+          if u_obj["new_addr_on_outbound"] == 1
+
+            new_unique_address = Address.generate_uniq_addr( u_obj )
+
+            addr = Address.new( u_id, new_unique_address )
+            addr.save
+
+            contact.address_id = addr.id
+
+          else
+
+            contact.address_id = u_obj["default_from_addr_id"]
+
+          end
+
+          contact.whitelisted = 1
+          contact.blacklisted = 0
+
+          contact.save
+
+        end
+
+      else
+
+        Log.error "INVALID SENDER ADDRESS"
+        exit 1
+
+      end
+
     end
 
   end
 
   def create_alias( alias_addr, real_local_addr )
 
-    u_id = User.get( real_local_addr ).id
+    u_id = User.get( real_local_addr )["id"]
 
-    a = Alias.new( u_id, alias_addr )
+    a = Address.new( u_id, alias_addr )
 
     a.save
 
