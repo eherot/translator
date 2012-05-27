@@ -12,6 +12,8 @@ class Db
         
         r_hash = result.fetch_hash
 
+        result.free
+
       end
 
     rescue Exception => e
@@ -20,8 +22,6 @@ class Db
       raise
 
     end
-
-    result.free
 
     return r_hash
 
