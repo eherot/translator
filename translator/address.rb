@@ -9,7 +9,8 @@ class Address
     :user_id,
     :enabled,
     :content_filter,
-    :whitelisted_addrs_only
+    :whitelisted_addrs_only,
+    :conn
 
   def self.update_existing( )
     
