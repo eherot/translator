@@ -114,8 +114,6 @@ class Translator
 
           new_from_addr = new_from_local_part + "@" + new_from_domain
 
-          Log.debug( "new_from_addr: #{new_from_addr}" )
-
         else
 
           # User has not previously sent or received anything from this
@@ -170,6 +168,8 @@ class Translator
           contact.conn.close
 
         end
+
+        Log.debug( "new_from_addr: #{new_from_addr}" )
 
         return new_from_addr
 
