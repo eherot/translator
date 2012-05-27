@@ -64,7 +64,7 @@ class User
 
   def save( )
 
-    conn = Db.new
+    @conn = Db.new
 
     @id = insert_user_row
 
@@ -73,7 +73,7 @@ class User
     
     @default_from_addr_id = addr.id
 
-    conn.close
+    @conn.close
 
   end
 
