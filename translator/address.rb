@@ -39,7 +39,7 @@ class Address
 
     conn = Db.new
 
-    domain_name = name.split("@").last
+    local_part,domain_name = name.split("@")
 
     domain_id = Domain.get( domain_name )["id"]
 
