@@ -26,6 +26,17 @@ class User
 
   end
 
+  def updated_default_from_addr_id
+
+    q = "UPDATE users " +
+      "SET default_from_addr_id = " + 
+      @default_from_addr_id + 
+      " WHERE user_id = " @id
+
+    @conn.q( q )
+
+  end
+
   def self.get_user_by_id( id )
 
     q = "SELECT * " +
@@ -75,6 +86,8 @@ class User
     addr.save
     
     @default_from_addr_id = addr.id
+
+    update_default_from_addr_id
 
     @conn.close
 
