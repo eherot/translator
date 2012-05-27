@@ -2,7 +2,16 @@ class Db
 
   def q( query )
 
-    result = @con.query( query )
+    begin
+
+      result = @con.query( query )
+
+    rescue Exception => e
+
+      puts "Original query was: <#{query}>"
+      raise
+
+    end
     
     r_hash = result.fetch_hash
 
