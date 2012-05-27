@@ -134,9 +134,17 @@ class Translator
 
             contact.address_id = addr.id
 
+            new_from_addr = new_unique_address
+
           else
 
             contact.address_id = u_obj["default_from_addr_id"]
+
+            new_from_addr_obj = Address.get( u_obj["default_from_addr_id"] )
+            new_from_addr_domain_obj = Domain.get( new_from_addr_obj["domain_id"] )
+
+            new_from_addr = new_from_addr_obj["local_part"] + 
+              new_from_addr_domain_obj["domain"]
 
           end
 
@@ -148,6 +156,8 @@ class Translator
           contact.save
 
           contact.conn.close
+
+          return new_from_addr
 
         end
 
