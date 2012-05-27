@@ -48,9 +48,9 @@ class Translator
 
         unique_addr_part = recipient_local_part_arr.last
 
-        if Address.get( "#{real_addr_part}@#{recipient_domain}" )
+        if a_obj = Address.get( "#{real_addr_part}@#{recipient_domain}" )
 
-          a = Address.new( to )
+          a = Address.new( a_obj["user_id"], to )
           a.save
 
           c = Contact.new( from, a.id )
