@@ -27,7 +27,7 @@ class Address
     result = conn.q( "SELECT * " +
                  "FROM addresses " +
                  "WHERE id = " + id +
-                 "LIMIT 1" )
+                 " LIMIT 1" )
 
     conn.close
 
