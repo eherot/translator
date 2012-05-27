@@ -2,11 +2,17 @@ class Db
 
   def q( query )
 
+    r_hash = {}
+
     begin
 
       result = @con.query( query )
     
-      r_hash = result.fetch_hash
+      if result
+        
+        r_hash = result.fetch_hash
+
+      end
 
     rescue Exception => e
 
