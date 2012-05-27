@@ -15,7 +15,7 @@ class User
       ") " +
       "VALUES " +
       "( " +
-        @real_local_addr +
+        "'" + @real_local_addr + "'" +
       ") "
 
     @conn.q( q )
