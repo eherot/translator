@@ -26,7 +26,7 @@ class User
 
   end
 
-  def updated_default_from_addr_id
+  def update_default_from_addr_id
 
     q = "UPDATE users " +
       "SET default_from_addr_id = " + 
