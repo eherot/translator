@@ -43,7 +43,7 @@ class Address
 
     domain_id = Domain.get( domain_name )["id"]
 
-    result = Db.q( "SELECT * " +
+    result = conn.q( "SELECT * " +
                  "FROM addresses " +
                  "WHERE " +
                    "local_part = '" + local_part + "'" +
