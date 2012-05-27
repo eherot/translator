@@ -12,7 +12,7 @@ class Domain
     result = conn.q( "SELECT * " +
                  "FROM domains " +
                  "WHERE id = " + id +
-                 "LIMIT 1" )
+                 " LIMIT 1" )
 
     conn.close
 
