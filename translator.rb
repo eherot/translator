@@ -29,6 +29,12 @@ class Translator
 
   def translate_address( from, to, direction )
 
+    # On "inbound" this method should return the "real" local address where
+    # the mail is supposed to go.
+    #
+    # On "outbound" it should return the "fake" FROM address where the mail
+    # should appear to come from.
+
     case direction
     when "inbound"
 
@@ -37,6 +43,8 @@ class Translator
         u_id = a_obj["user_id"]
 
         real_local_addr = User.get( u_id )["real_local_addr"]
+
+        return real_local_addr
 
       else
 
@@ -48,7 +56,9 @@ class Translator
 
         unique_addr_part = recipient_local_part_arr.last
 
-        if a_obj = Address.get( "#{real_addr_part}@#{recipient_domain}" )
+        real_local_addr = real_addr_part + "@" + recipient_domain
+
+        if a_obj = Address.get( real_local_addr )
 
           db_conn = Db.new
 
@@ -69,6 +79,8 @@ class Translator
           c.save
 
           db_conn.close
+
+          return real_local_addr
 
         else
 
