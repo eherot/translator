@@ -69,6 +69,9 @@ class User
     @id = insert_user_row
 
     addr = Address.new( @id, @real_local_addr )
+
+    addr.conn = @conn
+
     addr.save
     
     @default_from_addr_id = addr.id
