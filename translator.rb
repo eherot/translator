@@ -32,7 +32,9 @@ class Translator
     case direction
     when "inbound"
 
-      if u_id = Address.get( to )["user_id"]
+      if a_obj = Address.get( to )
+
+        u_id = a_obj["user_id"]
 
         real_local_addr = User.get( u_id )["real_local_addr"]
 
