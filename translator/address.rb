@@ -79,17 +79,27 @@ class Address
       "( " +
         "local_part, " +
         "domain_id, " +
-        "user_id, " +
-        "enabled, "
+        "user_id"
 
-    if @content_filter
+    if @enabled
 
-      q += "content_filter, "
+        q += ",enabled"
 
     end
 
-    q += "whitelisted_addrs_only " +
-      ") VALUES ( " +
+    if @content_filter
+
+      q += ",content_filter"
+
+    end
+
+    if @whitelisted_addrs_only
+
+      q += ",whitelisted_addrs_only"
+
+    end
+
+    q += ") VALUES ( " +
         "'" + @local_part + "', " +
         @domain_id + ", " +
         @user_id
