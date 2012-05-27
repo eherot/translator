@@ -45,7 +45,7 @@ class Address
     result = Db.q( "SELECT * " +
                  "FROM addresses " +
                  "WHERE " +
-                   "local_part = '" + local_part + "'"
+                   "local_part = '" + local_part + "'" +
                      " AND " +
                    "domain_id = " + domain_id + 
                  " LIMIT 1" )
@@ -117,7 +117,7 @@ class Address
 
     q = "SELECT LAST_INSERT_ID()"
 
-    return @conn.q ( q )
+    return @conn.q( q )
 
   end
 
@@ -157,7 +157,9 @@ class Address
 
   end
 
-  def initialize( @user_id, address )
+  def initialize( user_id, address )
+
+    @user_id = user_id
 
     @local_part,domain = address.split("@")
 
