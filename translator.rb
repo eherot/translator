@@ -50,14 +50,23 @@ class Translator
 
         if a_obj = Address.get( "#{real_addr_part}@#{recipient_domain}" )
 
+          db_conn = Db.new
+
           a = Address.new( a_obj["user_id"], to )
+
+          a.conn = db_conn
+
           a.save
 
           c = Contact.new( from, a.id )
 
+          c.conn = db_conn
+
           c.whitelisted,c.blacklisted = 0,0
 
           c.save
+
+          db_conn.close
 
         else
 

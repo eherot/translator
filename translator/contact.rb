@@ -5,7 +5,8 @@ class Contact
   attr_accessor :contact_email,
     :address_id,
     :whitelisted,
-    :blacklisted
+    :blacklisted,
+    :conn
 
   def self.get_by_address( user_id, contact_email )
 
