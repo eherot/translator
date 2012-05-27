@@ -163,13 +163,15 @@ class Address
 
     @local_part,domain = address.split("@")
 
-    @domain_id = Domain.get( domain )
+    domain_obj = Domain.get( domain )
     
-    if ! @domain_id
+    if ! domain_obj
 
       raise "Address contains invalid domain"
 
     end
+
+    @domain_id = domain_obj["id"]
 
   end
 
