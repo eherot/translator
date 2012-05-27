@@ -53,13 +53,13 @@ class Contact
 
     if @whitelisted
 
-      q += "," + @whitelisted
+      q += "," + @whitelisted.to_s
 
     end
 
     if @blacklisted
 
-      q += "," + @blacklisted
+      q += "," + @blacklisted.to_s
 
     end
 
