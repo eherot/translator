@@ -39,7 +39,7 @@ class Translator
 
         return { 
           "accept" => true,
-          "status" => 200,
+          "status" => 201,
           "reason" => "Whitelisted sender"
         }
 
@@ -72,6 +72,14 @@ class Translator
         "reason" => "Sent to default address"
       }
 
+    else
+
+      return {
+        "accept" => true,
+        "status" => 200,
+        "reason" => "No problems"
+      }
+
     end
 
   end
@@ -100,7 +108,7 @@ class Translator
 
         if security_result["accept"] == false
 
-          Log.info("REJECTED because #{security_result["reason"]}")
+          Log.info("REJECTED; Reason: #{security_result["reason"]}")
 
           return "REJECT"
 
@@ -124,7 +132,7 @@ class Translator
 
         if a_obj = Address.get( real_local_addr )
 
-          Log.info( "INBOUND: TO NEW ADDRESS (UID: #{a_obj["user_id"]}" )
+          Log.info( "INBOUND: TO NEW ADDRESS (UID: #{a_obj["user_id"]})" )
 
           db_conn = Db.new
 
